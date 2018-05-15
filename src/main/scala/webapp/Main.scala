@@ -1,5 +1,6 @@
 package webapp
 
+import com.sun.org.apache.xerces.internal.xni.parser.XMLPullParserConfiguration
 import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.html.{Canvas, Div, Image}
@@ -19,12 +20,13 @@ object Main {
       createOnResizeListener()
       document.body.style.backgroundColor="#101B29"
       val rootDiv = createRootDiv
-      val image = createEarthImage
       val canvas = createCanvas
+      
+      drawSvgInCanvas(canvas,image)
       
       rootDiv.appendChild(canvas)
       document.body.appendChild(rootDiv)
-      drawImage(canvas,image)
+      
    }
    
    def createRootDiv : Div = {
@@ -43,7 +45,6 @@ object Main {
       earthImage.style.display="none"
       earthImage.style.width = 90.ps
       earthImage.style.height = 80.ps
-      earthImage.src="../img/worldIndiaLow.svg"
       earthImage
    }
    
@@ -55,22 +56,31 @@ object Main {
       canvas
    }
    
-   def drawImage(canvas: Canvas,image: Image): Unit ={
-   
-      val context2D = canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-      image.onload = (_) =>{
-         context2D.drawImage(
-            image,
-            0.0,
-            0.0,10,10
-         )
-      }
-      
-   }
-   
    def followDimensions(function:(Double,Double) => Unit): Unit ={
       function(window.innerWidth,window.innerHeight)
       htmlElementsDims+=function
+   }
+   
+   def drawSvgInCanvas(canvas: Canvas,image: Image): Unit ={
+      
+      val svg = document.getElementById("earth-map")
+      
+      val xml = new XMLSerializer().serializeToString(svg)
+      val svg64 = dom.window.btoa(xml)
+      val b64Start = "data:image/svg+xml;base64,"
+      
+      val image64 = b64Start + svg64
+      
+      image.src = image64
+      
+      image.onload = _=>{
+         
+         val context = canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+         context.drawImage(image,0,0)
+      
+      }
+      
+      
    }
    
    def createOnResizeListener(): Unit ={
