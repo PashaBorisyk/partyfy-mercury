@@ -17,13 +17,17 @@ object Main {
    
    def main(args: Array[String]): Unit = {
       println("main inited")
-      createOnResizeListener()
       document.body.style.backgroundColor="#101B29"
+      
+      createOnResizeListener()
+      
       val rootDiv = createRootDiv
       val canvas = createCanvas
+      val image = createEarthImage
       
-      drawSvgInCanvas(canvas,image)
+      drawImageOnCanvas(image,canvas)
       
+      rootDiv.appendChild(image)
       rootDiv.appendChild(canvas)
       document.body.appendChild(rootDiv)
       
@@ -33,6 +37,7 @@ object Main {
       val rootDiv = document.createElement("div").asInstanceOf[Div]
       rootDiv.align = "center"
       rootDiv.style.width="100%"
+      rootDiv.style.width="relative"
       followDimensions{ (_, h)=>
          rootDiv.style.minHeight = (h*0.98).px
       }
@@ -41,18 +46,15 @@ object Main {
    
    def createEarthImage: Image = {
       
-      val earthImage = document.createElement("img").asInstanceOf[Image]
-      earthImage.style.display="none"
-      earthImage.style.width = 90.ps
-      earthImage.style.height = 80.ps
-      earthImage
+      val image = document.createElement("img").asInstanceOf[Image]
+      image.src="../img/earth.svg"
+      image.style.position = "absolute"
+      image
    }
    
    def createCanvas : Canvas = {
-      
       val canvas = document.createElement("canvas").asInstanceOf[Canvas]
-      canvas.style.width = 90.ps
-      canvas.style.height = 80.ps
+      canvas.style.position = "absolute"
       canvas
    }
    
@@ -61,26 +63,26 @@ object Main {
       htmlElementsDims+=function
    }
    
-   def drawSvgInCanvas(canvas: Canvas,image: Image): Unit ={
-      
-      val svg = document.getElementById("earth-map")
-      
-      val xml = new XMLSerializer().serializeToString(svg)
-      val svg64 = dom.window.btoa(xml)
-      val b64Start = "data:image/svg+xml;base64,"
-      
-      val image64 = b64Start + svg64
-      
-      image.src = image64
-      
-      image.onload = _=>{
-         
-         val context = canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-         context.drawImage(image,0,0)
-      
+   def drawImageOnCanvas(image: Image,canvas: Canvas): Unit ={
+      image.onload =  _ =>{
+         followDimensions((w,h) =>{
+            if(w > h) {
+               image.attributes.removeNamedItem("width")
+               image.height = (h * 0.8).toInt
+            }
+            else {
+               image.attributes.removeNamedItem("height")
+               image.width = (w * 0.8).toInt
+            }
+            canvas.width = image.clientWidth
+            canvas.height = image.clientHeight
+            canvas.style.right = ((w - canvas.width)/ 2f).px
+            canvas.style.top = ((h - canvas.height) /2f).px
+            image.style.right = ((w - image.width)/ 2f).px
+            image.style.top = ((h - image.height) /2f).px
+   
+         })
       }
-      
-      
    }
    
    def createOnResizeListener(): Unit ={
