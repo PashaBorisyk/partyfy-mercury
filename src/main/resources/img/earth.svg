@@ -6,7 +6,7 @@
             <defs>
                 <style type="text/css">.land
                     {
-                    fill: #CCCCCC;
+                    fill: #272932;
                     fill-opacity: 1;
                     stroke:white;
                     stroke-opacity: 1;
