@@ -5,7 +5,8 @@ import org.scalajs.dom._
 import org.scalajs.dom.ext.Color
 import org.scalajs.dom.html.{Canvas, Div, Image}
 import webapp.ext.extensions._
-import webapp.socket.EventCircle
+import webapp.model.EventCircle
+import webapp.socket.SocketStreamConnection
 
 import scala.collection._
 import scala.util.Random
@@ -30,9 +31,9 @@ object Main {
       rootDiv.appendChild(image)
       rootDiv.appendChild(canvas)
       document.body.appendChild(rootDiv)
-
-
-
+   
+   
+      SocketStreamConnection.createSocketConnection()
       println("initializing finished!")
    }
 
@@ -102,20 +103,18 @@ object Main {
          val delta = System.currentTimeMillis() - time
          passed += delta
 
-         val animatedValue = (passed % EventCircle.RADIUS_DRAWING_TIME) / EventCircle.RADIUS_DRAWING_TIME
-            .toDouble
+         val animatedValue = (passed % EventCircle.RADIUS_DRAWING_TIME) / EventCircle.RADIUS_DRAWING_TIME.toDouble
          canvasRenderingContext2D.clearRect(0, 0, canvas.width, canvas.height)
 
          for (circle <- circleDrawingQueue) {
+            val currentAnimatedValue = circle.value + animatedValue
             canvasRenderingContext2D.beginPath()
-            canvasRenderingContext2D.globalAlpha = 3-(((circle.radius + animatedValue)*3)%3)
             canvasRenderingContext2D.arc(
                circle.x,
                circle.y,
-               ((circle.radius + animatedValue) * EventCircle.MAX_CIRCLE_RADIUS) % EventCircle.MAX_CIRCLE_RADIUS,
-               0, Math.PI * 2, anticlockwise = false)
-            canvasRenderingContext2D.lineWidth = ((circle.stroke + animatedValue) * EventCircle.MAX_CIRCLE_STROKE) %
-               EventCircle.MAX_CIRCLE_STROKE
+               (currentAnimatedValue * EventCircle.MAX_CIRCLE_RADIUS) % EventCircle.MAX_CIRCLE_RADIUS,
+               0, Math.PI * 2)
+            canvasRenderingContext2D.lineWidth = (currentAnimatedValue * EventCircle.MAX_CIRCLE_STROKE) % EventCircle.MAX_CIRCLE_STROKE
             canvasRenderingContext2D.stroke()
          }
          canvasRenderingContext2D.strokeStyle = EventCircle.STROKE_COLOR
@@ -135,8 +134,7 @@ object Main {
          circleDrawingQueue += EventCircle(
             x = Random.nextDouble() * canvas.width,
             y = Random.nextDouble() * canvas.height,
-            stroke = strokeRadiusBeginValue,
-            radius = strokeRadiusBeginValue
+            value = strokeRadiusBeginValue
          )
       }
 
