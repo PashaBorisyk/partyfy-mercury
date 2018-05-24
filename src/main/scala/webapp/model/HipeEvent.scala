@@ -1,13 +1,15 @@
 package webapp.model
 
 
-case class EventCircle(
+case class HipeEvent(    nickname:String ="",
+                         photoUrl:String="",
+                         text:String ="",
                          x: Double = 0.0,
                          y: Double = 0.0,
                          value: Double = 0.0
                       )
 
-object EventCircle {
+object HipeEventAnimation {
    
    final val MAX_CIRCLE_RADIUS = 1f
    final val MAX_CIRCLE_STROKE = 3f

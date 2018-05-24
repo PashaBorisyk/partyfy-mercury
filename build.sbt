@@ -11,3 +11,4 @@ scalaJSUseMainModuleInitializer := true
 skip in packageJSDependencies := false
 
 libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.5"
+libraryDependencies += "com.lihaoyi" %%% "upickle" % "0.6.6"
