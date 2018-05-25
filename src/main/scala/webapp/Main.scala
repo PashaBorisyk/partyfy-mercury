@@ -15,16 +15,26 @@ object Main {
       val rootDiv = Creator.createRootDiv()
       val canvas = Creator.createCanvas()
       val image = Creator.createEarthImage()
-      val inputText = Creator.createInputText("Type username")
+      val usernameInput = Creator.createInputText("Type username")
+      val passwordInput = Creator.createInputText("Type password")
+      
+      val inputsDiv = Creator.createInputsDiv()(usernameInput,passwordInput)
+      
       Creator.drawCanvasUponImage(image, canvas)
+      
       val animator = PointsAnimator(canvas)
+      
       animator.initDrawing()
+      
       rootDiv.appendChild(image)
       rootDiv.appendChild(canvas)
-      rootDiv.appendChild(inputText)
+      rootDiv.appendChild(inputsDiv)
+      
       document.body.appendChild(rootDiv)
+      
       SocketStreamConnection.addCallback(animator.createEventPoint)
       SocketStreamConnection.createSocketConnection()
+      
       println("initializing finished!")
       
    }

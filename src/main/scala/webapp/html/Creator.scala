@@ -1,7 +1,7 @@
 package webapp.html
 
 import org.scalajs.dom
-import org.scalajs.dom.html.{Canvas, Div, Image}
+import org.scalajs.dom.html.{Canvas, Div, Element, Image}
 import org.scalajs.dom.raw.{HTMLInputElement, HTMLLabelElement}
 import org.scalajs.dom.{document, window}
 import webapp.ext.extensions._
@@ -9,8 +9,6 @@ import webapp.ext.extensions._
 import scala.collection.mutable
 
 object Creator {
-   
-   createOnResizeListener()
    
    private final val htmlElementsDims = mutable.Set[(Double, Double) => Unit]()
    
@@ -23,6 +21,23 @@ object Creator {
          rootDiv.style.minHeight = (h * 0.97).px
       }
       rootDiv
+   }
+   
+   def createInputsDiv(width:Float=400)(inputs:Element*): Div = {
+      
+      val inputRootDiv = document.createElement("div").asInstanceOf[Div]
+      inputRootDiv.style.width = width.px
+      inputRootDiv.style.position = "absolute"
+      
+      inputs.foreach(el => inputRootDiv.appendChild(el))
+      
+      followDimensions((w,h)=>{
+         println(inputRootDiv.clientHeight)
+         inputRootDiv.style.right = ((w - width) / 2f).px
+         inputRootDiv.style.top = ((h- inputRootDiv.clientHeight)/2f).px
+      })
+      
+      inputRootDiv
    }
    
    def createEarthImage(): Image = {
@@ -48,8 +63,7 @@ object Creator {
       
       val root = document.createElement("div").asInstanceOf[Div]
       root.classList.add("Wrapper")
-      root.style.position ="absolute"
-      root.style.zIndex = "11"
+      root.style.width = 100.ps
       
       val header = document.createElement("h1")
       header.classList.add("Title")
@@ -71,13 +85,6 @@ object Creator {
       label.classList.add("Input-label")
       label.textContent = labelText
       inputRoot.appendChild(label)
-   
-   
-      root.style.width = 400.px
-      
-      followDimensions((w,h)=>{
-         root.style.right = ((w - 400) / 2f).px
-      })
       
       root
       
@@ -105,10 +112,11 @@ object Creator {
       }
    }
    
-   def createOnResizeListener(): Unit = {
-      dom.window.onresize = _ => {
-         htmlElementsDims.foreach(_ (window.innerWidth, window.innerHeight))
-      }
+   dom.window.onresize = _ => {
+      htmlElementsDims.foreach(_ (window.innerWidth, window.innerHeight))
+   }
+   document.body.onloadstart = _ =>{
+      htmlElementsDims.foreach(_ (window.innerWidth, window.innerHeight))
    }
    
    private object Elements{
