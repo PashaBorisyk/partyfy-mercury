@@ -27,6 +27,7 @@ object SocketStreamConnection {
       }
       
       socket.onmessage = messageEvent => {
+         println(messageEvent.data.toString)
          callbacks.foreach(_(read[HipeEvent](messageEvent.data.toString)))
       }
       
