@@ -1,1 +1,1 @@
-"# hipe-front" 
+# Partyfy front-end application 
